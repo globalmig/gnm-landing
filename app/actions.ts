@@ -1,7 +1,5 @@
 "use server";
 
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
-
 export interface LeadFormState {
   status: "idle" | "success" | "error";
   message?: string;
@@ -48,16 +46,29 @@ export async function submitLead(formData: FormData): Promise<LeadFormState> {
     `마케팅 정보 수신 동의(선택): ${agreeMarketing ? "동의" : "미동의"}`,
   ].join("\n");
 
-  const { error } = await supabaseAdmin.from("inquiries").insert({
-    source: "landing",
-    name,
-    phone,
-    title: "맞춤혜택 조회 문의가 들어왔습니다",
-    content,
-    is_scret: false,
-  });
+  try {
+    const response = await fetch(`${process.env.INQUIRY_API_BASE_URL}/api/inquiries`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        source: "landing",
+        name,
+        phone,
+        title: "맞춤혜택 조회 문의가 들어왔습니다",
+        content,
+        category,
+        bundle_discount_opt_in: bundleDiscountOptIn,
+        agree_collection: agreeCollection,
+        agree_third_party: agreeThirdParty,
+        agree_age: agreeAge,
+        agree_marketing: agreeMarketing,
+      }),
+    });
 
-  if (error) {
+    if (!response.ok) {
+      return { status: "error", message: "접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요." };
+    }
+  } catch {
     return { status: "error", message: "접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요." };
   }
 
