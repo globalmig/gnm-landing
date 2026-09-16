@@ -55,9 +55,9 @@ export default function LeadForm() {
     <>
       <form onSubmit={handleSubmit} className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl pc:p-8">
         <h2 className="text-lg font-bold text-gray-900 pc:text-xl">
-          오늘 받을 수 있는 <span className="text-blue-600">최대 혜택</span>,
+          지금 안 바꾸면 매달 손해!
           <br />
-          1분 만에 확인해 보세요!
+          <span className="text-primary">혜택은 최대로</span> 챙겨가세요.
         </h2>
 
         <div className="mt-6 grid grid-cols-3 gap-2 pc:gap-3">

@@ -7,7 +7,12 @@ export interface LeadFormState {
   message?: string;
 }
 
-const CATEGORIES = new Set(["internet", "tv", "combo"]);
+const CATEGORY_LABELS: Record<string, string> = {
+  internet: "인터넷",
+  tv: "TV",
+  combo: "인터넷+TV",
+};
+const CATEGORIES = new Set(Object.keys(CATEGORY_LABELS));
 const PHONE_REGEX = /^01[0-9]-?\d{3,4}-?\d{4}$/;
 
 export async function submitLead(formData: FormData): Promise<LeadFormState> {
@@ -33,15 +38,23 @@ export async function submitLead(formData: FormData): Promise<LeadFormState> {
     return { status: "error", message: "필수 동의 항목에 모두 동의해주세요." };
   }
 
-  const { error } = await supabaseAdmin.from("leads").insert({
-    category,
+  const categoryLabel = CATEGORY_LABELS[category] ?? category;
+  const content = [
+    `신청 카테고리: ${categoryLabel}`,
+    `결합 할인 안내 수신: ${bundleDiscountOptIn ? "동의" : "미동의"}`,
+    `개인정보 수집 및 이용 동의(필수): ${agreeCollection ? "동의" : "미동의"}`,
+    `개인정보 제3자 제공 동의(필수): ${agreeThirdParty ? "동의" : "미동의"}`,
+    `만 14세 이상 확인(필수): ${agreeAge ? "동의" : "미동의"}`,
+    `마케팅 정보 수신 동의(선택): ${agreeMarketing ? "동의" : "미동의"}`,
+  ].join("\n");
+
+  const { error } = await supabaseAdmin.from("inquiries").insert({
+    source: "landing",
     name,
     phone,
-    bundle_discount_opt_in: bundleDiscountOptIn,
-    agree_collection: agreeCollection,
-    agree_third_party: agreeThirdParty,
-    agree_age: agreeAge,
-    agree_marketing: agreeMarketing,
+    title: "맞춤혜택 조회 문의가 들어왔습니다",
+    content,
+    is_scret: false,
   });
 
   if (error) {

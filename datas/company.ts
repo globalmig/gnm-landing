@@ -1,5 +1,5 @@
 export const COMPANY_INFO = {
-  name: "에이든",
+  name: "지앤엠컴퍼니",
   phone: " 010-3621-0818",
   phoneHref: "tel:010-3621-0818",
   address: "대전광역시 대덕구 한밭대로 1149, 3층 302호 (중리동)",
